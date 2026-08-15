@@ -76,6 +76,14 @@ form{display:grid;gap:.9rem;margin-top:1.2rem;}
 
 footer{text-align:center;color:var(--soft);font-size:.88rem;padding-block:2rem 3rem;}
 footer a{color:var(--leaf);font-weight:700;text-decoration:none;}
+
+.hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden;}
+.picked{margin-top:1.1rem;font-weight:800;color:var(--leaf);font-size:.96rem;}
+.picked b{color:var(--ink);}
+.picked[hidden]{display:none;}
+#lead>.btn{width:100%;font-size:1.12rem;padding:1rem 1.4rem;margin-bottom:.5rem;}
+.err{border:2px solid var(--sun);background:color-mix(in srgb,var(--sun) 10%,var(--card));border-radius:14px;padding:1rem 1.1rem;margin-top:1rem;color:var(--ink);font-weight:600;font-size:.92rem;}
+.err a{color:var(--sun-d);font-weight:800;}
 </style>
 
 <header><div class="wrap bar">
@@ -101,41 +109,49 @@ footer a{color:var(--leaf);font-weight:700;text-decoration:none;}
     <h1>Got a tree that needs work?<br><span class="accent">We do free consultations!</span></h1>
   </section>
 
-  <section class="card" id="quote">
-    <h2>Fill out the form and we come out to you.</h2>
-    <div id="formzone">
-      <form id="f" novalidate>
-        <div class="row">
-          <div class="fld"><label for="fn">First name</label><input id="fn" name="first" required></div>
-          <div class="fld"><label for="ln">Last name</label><input id="ln" name="last" required></div>
-        </div>
-        <div class="fld"><label for="ph">Phone number</label><input id="ph" name="phone" type="tel" required placeholder="Best number to reach you"></div>
-        <div class="fld"><label for="need">What do you need?</label>
-          <select id="need" name="need">
-            <option>Tree removal</option><option>Trimming / pruning</option><option>Stump grinding</option><option>Storm damage</option><option>Land clearing</option><option>Not sure &mdash; take a look</option>
-          </select>
-        </div>
-        <div class="fld"><label for="notes">Notes</label><textarea id="notes" name="notes" placeholder="Anything helpful &mdash; how big, how close to the house, how soon."></textarea></div>
-        <button class="btn" type="submit">Send</button>
-      </form>
-    </div>
-  </section>
+  <div id="leadzone">
+  <form id="lead" novalidate>
+    <input type="hidden" name="access_key" value="6cb5fcbe-807f-4c61-ba44-305765873bb0">
+    <input type="hidden" name="subject" value="New consultation request from your website">
+    <input type="hidden" name="from_name" value="Ark Tree Services Website">
+    <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
+    <input type="hidden" name="Preferred day" id="hDay">
+    <input type="hidden" name="Preferred time" id="hTime">
 
-  <section class="card" id="schedule">
-    <h2>Schedule a free consultation</h2>
-    <p class="sub">Pick a day and time that works &mdash; we&rsquo;ll confirm.</p>
-    <div id="calzone">
-      <div class="cal-head">
-        <button class="nav" id="prev" aria-label="Previous month">&#8249;</button>
-        <span class="mlabel" id="mlabel"></span>
-        <button class="nav" id="next" aria-label="Next month">&#8250;</button>
+    <section class="card">
+      <h2>Fill out the form and we come out to you.</h2>
+      <div class="row" style="margin-top:1.2rem;">
+        <div class="fld"><label for="fn">First name</label><input id="fn" name="First name" required></div>
+        <div class="fld"><label for="ln">Last name</label><input id="ln" name="Last name" required></div>
       </div>
-      <div class="dow"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
-      <div class="days" id="days"></div>
-      <div class="slots" id="slots"><span class="lbl">Pick a time</span></div>
-      <div class="cal-cta"><button class="btn green" id="book" disabled>Request this time</button></div>
-    </div>
-  </section>
+      <div class="fld" style="margin-top:.9rem;"><label for="ph">Phone number</label><input id="ph" name="Phone" type="tel" required placeholder="Best number to reach you"></div>
+      <div class="fld" style="margin-top:.9rem;"><label for="need">What do you need?</label>
+        <select id="need" name="What you need">
+          <option>Tree removal</option><option>Trimming / pruning</option><option>Storm damage</option><option>Not sure &mdash; take a look</option>
+        </select>
+      </div>
+      <div class="fld" style="margin-top:.9rem;"><label for="notes">Notes</label><textarea id="notes" name="Notes" placeholder="Anything helpful &mdash; how big, how close to the house, how soon."></textarea></div>
+    </section>
+
+    <section class="card">
+      <h2>Schedule a free consultation</h2>
+      <p class="sub">Optional &mdash; pick a day and time you&rsquo;d like us to come out, and we&rsquo;ll confirm.</p>
+      <div id="calzone">
+        <div class="cal-head">
+          <button type="button" class="nav" id="prev" aria-label="Previous month">&#8249;</button>
+          <span class="mlabel" id="mlabel"></span>
+          <button type="button" class="nav" id="next" aria-label="Next month">&#8250;</button>
+        </div>
+        <div class="dow"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+        <div class="days" id="days"></div>
+        <div class="slots" id="slots"><span class="lbl">Pick a time</span></div>
+        <p class="picked" id="picked" hidden></p>
+      </div>
+    </section>
+
+    <button class="btn" type="submit" id="send">Send my request</button>
+  </form>
+  </div>
 
 </main>
 
@@ -148,22 +164,22 @@ footer a{color:var(--leaf);font-weight:700;text-decoration:none;}
 const root=document.documentElement;
 document.getElementById('theme').addEventListener('click',()=>{const d=matchMedia('(prefers-color-scheme: dark)').matches;const n=root.dataset.theme||(d?'dark':'light');root.dataset.theme=n==='dark'?'light':'dark';});
 
-/* form */
-document.getElementById('f').addEventListener('submit',e=>{
-  e.preventDefault();const f=e.target;
-  if(!f.first.value.trim()||!f.last.value.trim()||!f.phone.value.trim()){alert('Please add your name and a phone number so we can reach you.');return;}
-  document.getElementById('formzone').innerHTML='<div class="ok"><b>Got it &mdash; thank you!</b><p>We&rsquo;ll reach out shortly to set up your free consultation. (Prototype: this will email straight to Ark once the site is live.)</p></div>';
-});
-
-/* calendar */
+/* calendar (part of the single form) */
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const SLOTS=['8:00 AM','9:30 AM','11:00 AM','1:00 PM','2:30 PM','4:00 PM'];
 const today=new Date();today.setHours(0,0,0,0);
 let view=new Date(today.getFullYear(),today.getMonth(),1);
 let selDay=null, selTime=null;
-const daysEl=document.getElementById('days'),slotsEl=document.getElementById('slots'),bookEl=document.getElementById('book');
+const daysEl=document.getElementById('days'),slotsEl=document.getElementById('slots');
+const hDay=document.getElementById('hDay'),hTime=document.getElementById('hTime'),pickedEl=document.getElementById('picked');
 function sameDay(a,b){return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
 function fmt(d){const dow=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()];return dow+', '+MONTHS[d.getMonth()]+' '+d.getDate();}
+function syncPicked(){
+  hDay.value=selDay?fmt(selDay):''; hTime.value=selTime||'';
+  if(selDay&&selTime){pickedEl.hidden=false;pickedEl.innerHTML='Requested visit: <b>'+fmt(selDay)+' at '+selTime+'</b>';}
+  else if(selDay){pickedEl.hidden=false;pickedEl.innerHTML='Now pick a time on <b>'+fmt(selDay)+'</b>';}
+  else{pickedEl.hidden=true;}
+}
 function render(){
   document.getElementById('mlabel').textContent=MONTHS[view.getMonth()]+' '+view.getFullYear();
   document.getElementById('prev').disabled=(view.getFullYear()===today.getFullYear()&&view.getMonth()===today.getMonth());
@@ -173,25 +189,45 @@ function render(){
   for(let i=0;i<first;i++){const b=document.createElement('div');b.className='day blank';daysEl.appendChild(b);}
   for(let d=1;d<=n;d++){
     const date=new Date(view.getFullYear(),view.getMonth(),d);
-    const btn=document.createElement('button');btn.className='day';btn.textContent=d;
+    const btn=document.createElement('button');btn.type='button';btn.className='day';btn.textContent=d;
     if(date<today){btn.disabled=true;}
     if(sameDay(date,selDay))btn.classList.add('sel');
-    btn.addEventListener('click',()=>{selDay=date;selTime=null;render();showSlots();});
+    btn.addEventListener('click',()=>{selDay=date;selTime=null;render();showSlots();syncPicked();});
     daysEl.appendChild(btn);
   }
 }
 function showSlots(){
   slotsEl.innerHTML='<span class="lbl">Pick a time on '+fmt(selDay)+'</span>';
-  SLOTS.forEach(t=>{const s=document.createElement('button');s.className='slot'+(t===selTime?' sel':'');s.textContent=t;
-    s.addEventListener('click',()=>{selTime=t;showSlots();update();});slotsEl.appendChild(s);});
-  slotsEl.classList.add('show');update();
+  SLOTS.forEach(t=>{const b=document.createElement('button');b.type='button';b.className='slot'+(t===selTime?' sel':'');b.textContent=t;
+    b.addEventListener('click',()=>{selTime=t;showSlots();syncPicked();});slotsEl.appendChild(b);});
+  slotsEl.classList.add('show');
 }
-function update(){bookEl.disabled=!(selDay&&selTime);}
 document.getElementById('prev').addEventListener('click',()=>{view=new Date(view.getFullYear(),view.getMonth()-1,1);render();});
 document.getElementById('next').addEventListener('click',()=>{view=new Date(view.getFullYear(),view.getMonth()+1,1);render();});
-bookEl.addEventListener('click',()=>{
-  if(!(selDay&&selTime))return;
-  document.getElementById('calzone').innerHTML='<div class="ok"><b>You&rsquo;re on the calendar!</b><p>Requested: '+fmt(selDay)+' at '+selTime+'. We&rsquo;ll call to confirm. (Prototype: this will connect to Ark&rsquo;s real calendar when the site goes live.)</p></div>';
-});
 render();
+
+/* one form, one send */
+const form=document.getElementById('lead');
+form.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const first=document.getElementById('fn').value.trim();
+  const last=document.getElementById('ln').value.trim();
+  const phone=document.getElementById('ph').value.trim();
+  if(!first||!last||!phone){alert('Please add your name and a phone number so we can reach you.');return;}
+  const btn=document.getElementById('send');const label=btn.textContent;
+  btn.disabled=true;btn.textContent='Sending...';
+  try{
+    const res=await fetch('https://api.web3forms.com/submit',{method:'POST',body:new FormData(form)});
+    const data=await res.json();
+    if(!data.success)throw new Error(data.message||'failed');
+    const when=hTime.value?(' We&rsquo;ll confirm your visit for '+hDay.value+' at '+hTime.value+'.'):'';
+    document.getElementById('leadzone').innerHTML='<div class="card"><div class="ok"><b>Got it &mdash; thank you!</b><p>Your request just went to Ark Tree Services and we&rsquo;ll reach out shortly.'+when+'</p></div></div>';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(err){
+    btn.disabled=false;btn.textContent=label;
+    let box=document.getElementById('err');
+    if(!box){box=document.createElement('div');box.id='err';box.className='err';btn.parentNode.insertBefore(box,btn.nextSibling);}
+    box.innerHTML='Sorry &mdash; that didn&rsquo;t send. Please call or text us at <a href="tel:+15129159067">(512) 915-9067</a> and we&rsquo;ll take care of you.';
+  }
+});
 </script>
