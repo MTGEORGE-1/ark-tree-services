@@ -135,7 +135,7 @@ footer a{color:var(--leaf);font-weight:700;text-decoration:none;}
 
     <section class="card">
       <h2>Schedule a free consultation</h2>
-      <p class="sub">Optional &mdash; pick a day and time you&rsquo;d like us to come out, and we&rsquo;ll confirm.</p>
+      <p class="sub">Optional &mdash; pick a day and time you&rsquo;d like us to come out (all times Central), and we&rsquo;ll confirm.</p>
       <div id="calzone">
         <div class="cal-head">
           <button type="button" class="nav" id="prev" aria-label="Previous month">&#8249;</button>
@@ -166,7 +166,8 @@ document.getElementById('theme').addEventListener('click',()=>{const d=matchMedi
 
 /* calendar (part of the single form) */
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const SLOTS=['8:00 AM','9:30 AM','11:00 AM','1:00 PM','2:30 PM','4:00 PM'];
+const WEEKDAY_SLOTS=['4:00 PM','5:00 PM','6:00 PM','7:00 PM'];
+const WEEKEND_SLOTS=['7:00 AM','8:00 AM','9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM','6:00 PM','7:00 PM'];
 const today=new Date();today.setHours(0,0,0,0);
 let view=new Date(today.getFullYear(),today.getMonth(),1);
 let selDay=null, selTime=null;
@@ -198,7 +199,8 @@ function render(){
 }
 function showSlots(){
   slotsEl.innerHTML='<span class="lbl">Pick a time on '+fmt(selDay)+'</span>';
-  SLOTS.forEach(t=>{const b=document.createElement('button');b.type='button';b.className='slot'+(t===selTime?' sel':'');b.textContent=t;
+  const dow=selDay.getDay();const list=(dow===0||dow===6)?WEEKEND_SLOTS:WEEKDAY_SLOTS;
+  list.forEach(t=>{const b=document.createElement('button');b.type='button';b.className='slot'+(t===selTime?' sel':'');b.textContent=t;
     b.addEventListener('click',()=>{selTime=t;showSlots();syncPicked();});slotsEl.appendChild(b);});
   slotsEl.classList.add('show');
 }
