@@ -166,8 +166,11 @@ document.getElementById('theme').addEventListener('click',()=>{const d=matchMedi
 
 /* calendar (part of the single form) */
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const WEEKDAY_SLOTS=['4:00 PM','5:00 PM','6:00 PM','7:00 PM'];
+const WEEKDAY_SLOTS=['3:00 PM','4:00 PM','5:00 PM','6:00 PM','7:00 PM'];
 const WEEKEND_SLOTS=['7:00 AM','8:00 AM','9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM','6:00 PM','7:00 PM'];
+/* fully booked days (YYYY-MM-DD) — no availability shown */
+const BOOKED=new Set(['2026-09-14','2026-09-15','2026-09-16','2026-09-17','2026-09-18','2026-09-19','2026-09-26','2026-09-27']);
+function isBooked(d){return BOOKED.has(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));}
 const today=new Date();today.setHours(0,0,0,0);
 let view=new Date(today.getFullYear(),today.getMonth(),1);
 let selDay=null, selTime=null;
@@ -192,6 +195,7 @@ function render(){
     const date=new Date(view.getFullYear(),view.getMonth(),d);
     const btn=document.createElement('button');btn.type='button';btn.className='day';btn.textContent=d;
     if(date<today){btn.disabled=true;}
+    else if(isBooked(date)){btn.disabled=true;btn.title='Fully booked';btn.setAttribute('aria-label',fmt(date)+' — fully booked');}
     if(sameDay(date,selDay))btn.classList.add('sel');
     btn.addEventListener('click',()=>{selDay=date;selTime=null;render();showSlots();syncPicked();});
     daysEl.appendChild(btn);
